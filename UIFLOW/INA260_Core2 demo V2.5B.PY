@@ -34,7 +34,7 @@ label_Hall = M5Label('Hall:', x=220, y=100, color=0xEEAE00, font=FONT_MONT_16, p
 #label_Hall2 = M5Label('Hall2:', x=220, y=100, color=0xEE1E00, font=FONT_MONT_16, parent=None)
 label_speed = M5Label('speed:', x=160, y=140, color=0x2EEE20, font=FONT_MONT_16, parent=None)
 label_T_cycle = M5Label('CycleT:', x=160, y=160, color=0xA22252, font=FONT_MONT_16, parent=None)
-label_sysinfo = M5Label('Sys_cnt', x=130, y=220, color=0x303030, font=FONT_MONT_12, parent=None)
+label_sysinfo = M5Label('Sys_cnt', x=130, y=220, color=0xA0A0A0, font=FONT_MONT_12, parent=None)
 label_Akkuinfo = M5Label('Akku', x=280, y=5, color=0x504000, font=FONT_MONT_12, parent=None)
 
 touch_button_HighPrecision = M5Btn(text='PWM', x=225, y=200, w=70, h=30, bg_c=0xFFFFFF, text_c=0x85d612, font=FONT_MONT_14, parent=None)
@@ -251,6 +251,7 @@ sys_cnt = 0
 T_interval = 250
 T_cycle = 1000
 WheelSPD = 0
+WheelSPD_KMH = 0
 #i2c0 = i2c_bus.easyI2C((26, 32), LM75_ADDRESS, freq=100000)
 i2c0 = i2c_bus.easyI2C(IIC_PORTA, LM75_ADDRESS2, freq=400000)
 LM75_sensor = LM75
@@ -334,6 +335,7 @@ T_start = time.ticks_ms() # get millisecond counter
 T_Hall = T_start
 T_cycle_tmp = T_Hall
 T_loop_delta = 0
+Wheel_run_cnt = 0
 while 1:
     
     T_loop = time.ticks_ms()
@@ -383,16 +385,23 @@ while 1:
         T_cycle_tmp = time.ticks_diff(time.ticks_ms(), T_Hall) # compute time 
         if (T_cycle_tmp< 10): #too fast, not valid sensor reading
           #T_Hall = time.ticks_ms() # get millisecond counter 
-          T_cycle=T_cycle+T_loop_delta #decrease speed gradually
+          T_cycle=T_cycle
+          #T_cycle=T_cycle+T_loop_delta #last cycle time, to decrease speed gradually  #need improve?
         else:
           T_cycle = T_cycle_tmp
+          WheelSPD = Wheel_length/T_cycle #m/s
         T_Hall = time.ticks_ms() # get millisecond counter 
           #T_cycle_tmp = T_Hall
           #wait_ms(10) 
     #NO input sense      
     else: #decrease speed gradually?
+        Wheel_run_cnt = Wheel_run_cnt+1
+        T_cycle = T_cycle
+        if (Wheel_run_cnt>50):
+           T_cycle = T_cycle+T_cycle_tmp
+           WheelSPD = Wheel_length/T_cycle #m/s
         #T_cycle = T_cycle + T_loop_delta # bugs?
-        T_cycle = time.ticks_diff(time.ticks_ms(), T_Hall) # bugs?
+        #T_cycle = time.ticks_diff(time.ticks_ms(), T_Hall) # bugs?
 
     
      
@@ -419,8 +428,8 @@ while 1:
            label_Pow.set_text('Power  :'+str(Power_calc)+'W')
            #print('Sys run cnt:'+str(Hall_status))
            
-       WheelSPD = Wheel_length/T_cycle #m/s
-       WheelSPD = WheelSPD*3.6 #km/h 
+       #WheelSPD = Wheel_length/T_cycle #m/s
+       WheelSPD_KMH = WheelSPD*3.6 #km/h 
        
        if (WheelSPD<1):
          WheelSPD = 0
@@ -439,11 +448,12 @@ while 1:
        tmp_str = '%1.2F' % power.getBatVoltage()
        label_Akkuinfo.set_text(tmp_str+' V')
        #label_Akkuinfo.set_text(str(power.getBatVoltage())+' V')
-       print('Sys run cnt:'+str(sys_cnt))
+       print('Sys fps:'+str(1000+sys_cnt/T_delta))
        print('loop:'+str(T_loop_delta)+'ms')
        print("Akku status:"+str(map_value((power.getBatVoltage()), 3.7, 4.1, 0, 100))+'%')
        label_sysinfo.set_text('run_cnt:'+str(sys_cnt))
        rgb.setColorAll(0x000000)
+       sys_cnt=0
        T_start=time.ticks_ms()
        
     T_loop_delta = time.ticks_diff(time.ticks_ms(), T_loop)   
