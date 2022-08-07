@@ -228,7 +228,7 @@ def buttonC_wasPressed():
 btnC.wasPressed(buttonC_wasPressed)
 
 
-print('Core2 bycycle Hall speed coupit V4.0B ')
+print('Core2 bycycle Hall speed coupit V4.1')
 print('Author: Zell, 22.June.2021')
 
 tmp_str = None
@@ -556,7 +556,7 @@ while 1:
        tmp_str = '%1.2F' % power.getBatVoltage()
        label_Akkuinfo.set_text(tmp_str+' V')
        #label_Akkuinfo.set_text(str(power.getBatVoltage())+' V')
-       tmp_str = '%5D' % (1000*sys_cnt/T_delta)
+       tmp_str = '%5.0F' % (1000*sys_cnt/T_delta)
        label_sysinfo.set_text('Sys fps:'+str(tmp_str))
        if(debug_print_EN):
           print('Speed:'+str(WheelSPD_KMH)+'Km/h')

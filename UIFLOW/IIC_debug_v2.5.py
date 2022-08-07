@@ -1,4 +1,5 @@
 #IIC scan debug code by l.zhou
+#V2.5 improved
 #V2.2 ported to core2 
 #V2.1 improve display ,  
 #V2.0 added loop time display , LCD brightness display
@@ -67,8 +68,8 @@ time.sleep(1)
 Sleep_EN = 0
 LCD_EN = 75
 try:
-  image_BMW = M5Img("res/BMW_coupit BG3.png", x=0, y=0, parent=None)
-  image_BMW.set_hidden(True)
+  #image_BMW = M5Img("res/BMW_coupit BG3.png", x=0, y=0, parent=None)
+  #image_BMW.set_hidden(True)
   image_BG = M5Img("res/BMW_next.png", x=0, y=0, parent=None)
   #lcd.image(lcd.CENTER, lcd.CENTER, 'res/ghost_in_the_shell.jpg')
   time.sleep(2) 
@@ -79,7 +80,7 @@ except:
 
 #label0 =M5Label('Text', x=54, y=35, color=0x000, font=FONT_MONT_14, parent=None)
 #title = M5Title(title="  ESP32 IIC debug v2.1, list iic addresses", x=3 , fgcolor=0xff99aa, bgcolor=0x1F1F1F)
-title = M5Label('Core2 IIC debug v2.2, list iic addresses', x=2, y=0, color=0xff99aa, font=FONT_MONT_14, parent=None)
+title = M5Label('Core2 IIC debug v2.5, list iic addresses', x=2, y=0, color=0xff99aa, font=FONT_MONT_14, parent=None)
 #a = i2c_bus.get(i2c_bus.PORTA)
 i2c0 = i2c_bus.easyI2C(i2c_bus.PORTA, 0x68, freq=100000)
 i2c1 = i2c_bus.easyI2C(PORT_IIC_internal, 0x127, freq=400000)
