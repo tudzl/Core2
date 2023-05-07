@@ -1,4 +1,4 @@
-#PWM APP V0.9 by Zell
+#PWM APP V0.9 by Zell， 2023.5.7
 #PWM output on PORT C, G14, middle GPIO  with Ferq from 1K to 10K
 from m5stack import *
 from m5stack_ui import *
@@ -37,7 +37,11 @@ def slider_freq_changed(var0):
   PWM0.pause()
   PWM_Freq = slider_freq.get_value()
   PWM_Freq = PWM_Freq * 100
-  PWM0.freq(PWM_Freq)
+  if PWM_Freq < 500 :
+    PWM_Freq = 500
+  if (PWM_Freq > 0) and (PWM_Freq<=10000):  
+    PWM0.freq(PWM_Freq)
+  wait(0.05)
   PWM0.resume()
   pass
 slider_freq.changed(slider_freq_changed)
@@ -60,6 +64,8 @@ switch_ON.off(switch_ON_off)
 
 def switch_ON_on():
   global PWM_Duty, PWM_Freq, var0, PWM0
+  PWM0.pause()
+  PWM0 = machine.PWM(14, freq=PWM_Freq, duty=PWM_Duty, timer=0)
   PWM0.resume()
   power.setVibrationEnable(True)
   wait(0.2)
