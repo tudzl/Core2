@@ -1,4 +1,4 @@
-#PWM APP V1.0by Zell， 2023.5.7
+#PWM APP V1.0 by Zell， 2023.5.7
 #PWM output on PORT C, G14, middle GPIO  with Ferq from 1K to 10K
 from m5stack import *
 from m5stack_ui import *
@@ -103,7 +103,8 @@ def touch_button_75_pressed():
   pass
 touch_button_75.pressed(touch_button_75_pressed)
 
-
+print("PWM APP V1.0 by Zell for Core2, PWM out on PortC_G14")
+print("Date: 7.May.2023")
 image_BG.set_align(ALIGN_CENTER, x=0, y=0, ref=screen.obj)
 PWM_Duty = 50
 PWM_Freq = 1000
