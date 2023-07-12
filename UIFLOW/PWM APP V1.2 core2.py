@@ -1,3 +1,5 @@
+#from machine import Pin
+
 #PWM APP V1.2 by Zell， 2023.6.15
 #PWM APP V1.1 by Zell， 2023.6.9
 #V1.2 added checkbox for frequency x10 range control and brightness control, and show discharge current, BtnABC controls
@@ -26,7 +28,7 @@ Zeit_Jetzt= None
 Timer_interval = 1000 #ms
 
 
-image_BG = M5Img("res/PWM_APP_BG.png", x=0, y=0, parent=None)
+image_BG = M5Img("res/PWM_APP_BGV2-min.png", x=0, y=0, parent=None)
 label_freq = M5Label('Freq:', x=20, y=20, color=0xf80303, font=FONT_MONT_14, parent=None)
 label_duty = M5Label('Duty_Cycle:', x=20, y=40, color=0xec990e, font=FONT_MONT_14, parent=None)
 switch_ON = M5Switch(x=200, y=42, w=70, h=30, bg_c=0xCCCCCC, color=0x0c9405, parent=None)
