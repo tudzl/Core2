@@ -1,0 +1,225 @@
+from m5stack import *
+from m5stack_ui import *
+from uiflow import *
+from m5stack import touch
+import time
+import math
+import unit
+import gc
+
+
+screen = M5Screen()
+screen.clean_screen()
+screen.set_screen_bg_color(0xFFFFFF)
+neopixel_0 = unit.get(unit.NEOPIXEL, unit.PORTB, 256)
+Pixel_R_value = 0
+Pixel_G_Value = 0
+Pixel_B_value = 0
+Pixel_value = 0xFFAA00
+
+TP_X_Pos = None
+TP_Y_Pos = None
+Pixel_X = None
+Pixel_Y = None
+Pxiel_panel_size_row = 16
+Pxiel_panel_size_col = 16
+Pxiel_idx = 0 # 1 to 256
+screen_ON_OFF =1
+Pixel_mode = 1
+slider_hidden_EN = 0
+TP_Pixel_Show_EN = 0 
+Color_Pick_mode_EN = 1
+
+label0 = M5Label('X:', x=20, y=225, color=0xf76a17, font=FONT_MONT_14, parent=None)
+label1 = M5Label('y:', x=128, y=225, color=0x2817f1, font=FONT_MONT_14, parent=None)
+slider_R = M5Slider(x=10, y=40, w=300, h=15, min=0, max=100, bg_c=0xa0a0a0, color=0xff0000, parent=None)
+slider_G = M5Slider(x=10, y=80, w=300, h=15, min=0, max=100, bg_c=0xa0a0a0, color=0x00ff00, parent=None)
+slider_B = M5Slider(x=10, y=120, w=300, h=15, min=0, max=100, bg_c=0xa0a0a0, color=0x0303ff, parent=None)
+cpicker = M5Cpicker(w=180, h=180)
+cpicker.set_align(ALIGN_IN_TOP_MID, x=0, y=25)
+switch_Cpick = M5Switch(x=240, y=160, w=70, h=30, bg_c=0xCCCCCC, color=0x0288FB, parent=None)
+switch_Cpick.set_hidden(False)
+
+def buttonA_wasPressed():
+  global Pixel_mode,Pixel_value
+  Pixel_R_value=0x00
+  Pixel_G_value=0x00
+  Pixel_B_value=0x00
+  Pixel_value_tmp = 0
+  if(1==Pixel_mode):
+    Pixel_R_value = 0xff
+    Pixel_G_Value = 0x00
+    Pixel_B_value = 0x00
+    Pixel_value_tmp = (Pixel_R_value <<16 )+ (Pixel_G_Value <<8) + Pixel_B_value
+  elif(2==Pixel_mode):
+     Pixel_R_value = 0x00
+     Pixel_G_Value = 0xff
+     Pixel_B_value = 0x00
+     Pixel_value_tmp = (Pixel_R_value <<16 )+ (Pixel_G_Value <<8) + Pixel_B_value
+  elif(3==Pixel_mode):
+     Pixel_R_value = 0x00
+     Pixel_G_Value = 0x00
+     Pixel_B_value = 0xff
+     Pixel_value_tmp = (Pixel_R_value <<16 )+ (Pixel_G_Value <<8) + Pixel_B_value
+  elif(4==Pixel_mode):
+     Pixel_R_value = 0xAA
+     Pixel_G_Value = 0x99
+     Pixel_B_value = 0x00
+     Pixel_value_tmp = (Pixel_R_value <<16 )+ (Pixel_G_Value <<8) + Pixel_B_value
+  elif(Pixel_mode<8):
+     Pixel_value_tmp = Pixel_value
+  else:
+     Pixel_mode=0
+  neopixel_0.setColorFrom(1, 256, Pixel_value_tmp)
+  Pixel_mode+=1
+  pass
+btnA.wasPressed(buttonA_wasPressed)
+
+
+def buttonB_wasPressed():
+  global slider_hidden_EN,TP_Pixel_Show_EN
+  slider_hidden_EN = 1-slider_hidden_EN
+  if(slider_hidden_EN):
+        slider_R.set_hidden(True)
+        slider_G.set_hidden(True)
+        slider_B.set_hidden(True)
+        switch_Cpick.set_hidden(True)
+        TP_Pixel_Show_EN =1
+  else:
+    if(Color_Pick_mode_EN==0):
+        print("#>:Slider show")
+        slider_R.set_hidden(False)
+        slider_G.set_hidden(False)
+        slider_B.set_hidden(False)
+        #switch_Cpick.set_hidden(False)
+    switch_Cpick.set_hidden(False)  
+    TP_Pixel_Show_EN =0
+  pass
+btnB.wasPressed(buttonB_wasPressed)
+
+
+def buttonC_wasPressed():
+  # global params
+  global screen_ON_OFF,slider_hidden_EN
+  screen_ON_OFF=1-screen_ON_OFF;
+  if screen_ON_OFF:
+      #slider_hidden_EN = 1-slider_hidden_EN
+      screen.set_screen_brightness(50)
+      #screen.clean_screen()
+      screen.set_screen_bg_color(0xffffcc)#will clear screen pixels drawed before
+      label0.set_hidden(False)
+      label0.set_hidden(False)
+      label_title.set_hidden(False)
+  else:
+      screen.set_screen_brightness(0)
+      neopixel_0.setColorFrom(1, 256, 0x000000)
+  pass
+btnC.wasPressed(buttonC_wasPressed)
+
+def slider_R_changed(value):
+  global Pixel_R_value, Pixel_G_Value, Pixel_B_value
+  Pixel_R_value = slider_R.get_value()
+  pass
+slider_R.changed(slider_R_changed)
+
+def slider_G_changed(value):
+  global Pixel_R_value, Pixel_G_Value, Pixel_B_value
+  Pixel_G_Value = slider_G.get_value()
+  pass
+slider_G.changed(slider_G_changed)
+
+def slider_B_changed(value):
+  global Pixel_R_value, Pixel_G_Value, Pixel_B_value
+  Pixel_B_value = slider_B.get_value()
+  pass
+slider_B.changed(slider_B_changed)
+
+def cpicker_event_cb(obj, event):
+    global Pixel_R_value,Pixel_G_Value,Pixel_B_value
+    if event == EVENT_VALUE_CHANGED:
+        color = obj.get_color()
+        red = color.ch.red
+        green = (color.ch.green_h << 3) + color.ch.green_l
+        blue = color.ch.blue
+        Pixel_R_value =red
+        Pixel_G_Value =green
+        Pixel_B_value = blue
+        #Pixel_value = (Pixel_R_value <<16 )+ (Pixel_G_Value <<8) + Pixel_B_value
+cpicker.set_cb(cpicker_event_cb)
+
+def switch_Cpick_on():
+  # global params
+  global Color_Pick_mode_EN
+  Color_Pick_mode_EN = 1-Color_Pick_mode_EN
+  if (0==Color_Pick_mode_EN):
+    cpicker.set_align(ALIGN_IN_TOP_MID, x=240, y=25)
+    print("#>:M5Cpicker hide")
+  else:
+    cpicker.set_align(ALIGN_IN_TOP_MID, x=0, y=25)
+    print("#>:M5Cpicker show")
+  pass
+switch_Cpick.on(switch_Cpick_on)
+
+#label_Pixel = M5Label('Pixel value:0x000000', x=10, y=180, color=0xf98803, font=FONT_MONT_18, parent=None)
+label_Pixel_hex = M5Label('Pixel value:0x000000', x=10, y=200, color=0xf98803, font=FONT_MONT_18, parent=None)
+
+slider_R.set_range(0, 255)
+slider_G.set_range(0, 255)
+slider_B.set_range(0, 255)
+
+neopixel_0.setColorFrom(1, 256, 0x000000)
+neopixel_0.setColorFrom(1, 16, 0xff0000)
+neopixel_0.setColorFrom(256-16+1, 256, 0xff0000)
+
+
+screen.set_screen_bg_color(0xffffcc)
+label_title = M5Label('Panel Pixel Touch demo V1.2', x=5, y=2, color=0xf62929, font=FONT_MONT_22, parent=None)
+#wait(1)
+
+
+while True:
+  if touch.status():
+    TP_X_Pos = touch.read()[0]
+    TP_Y_Pos = touch.read()[1]
+    print((str('X_pos:') + str(TP_X_Pos)))
+    print((str('Y_pos:') + str(TP_Y_Pos)))
+    label0.set_text("TP_X:"+str(TP_X_Pos))
+    label1.set_text("TP_Y:"+str(TP_Y_Pos))
+    if(TP_X_Pos>255):
+      Pixel_X = math.floor(255/15 )-1
+    elif(TP_X_Pos>16):
+      Pixel_X = math.floor((TP_X_Pos-16)/15 ) #offset TP pos
+    else:
+      Pixel_X = 1
+    if(TP_Y_Pos>240):  
+      Pixel_Y = math.floor(240/15)
+    elif(TP_Y_Pos>16):
+      Pixel_Y = math.floor(TP_Y_Pos/15)-1
+    else:
+      Pixel_Y = 0
+    print((str('Pixel_X_pos:') + str(Pixel_X)))
+    print((str('Pixel_Y_pos:') + str(Pixel_Y)))
+    if((Pixel_Y % 2 == 0)):
+      Pxiel_idx = 16-Pixel_X+1 + Pixel_Y*Pxiel_panel_size_col
+    else:
+      Pxiel_idx = Pixel_X + Pixel_Y*Pxiel_panel_size_col
+    print((str('Pixel_idx:') + str(Pxiel_idx)))
+    print(str('----------') )
+    Pixel_value = (Pixel_R_value <<16 )+ (Pixel_G_Value <<8) + Pixel_B_value
+    
+    #Pixel_value = (Pixel_R_value <<16 )+ (Pixel_G_Value <<8) + Pixel_B_value
+    if (Pxiel_idx<255):
+      if(TP_Pixel_Show_EN):
+        lcd.pixel(TP_X_Pos, TP_Y_Pos, Pixel_value)
+        lcd.pixel(TP_X_Pos-1, TP_Y_Pos, Pixel_value)
+        lcd.pixel(TP_X_Pos+1, TP_Y_Pos, Pixel_value)
+        lcd.pixel(TP_X_Pos, TP_Y_Pos-1, Pixel_value)
+        lcd.pixel(TP_X_Pos, TP_Y_Pos+1, Pixel_value)
+        neopixel_0.setColor(Pxiel_idx,Pixel_value)
+
+    #label_Pixel.set_text_color(Pixel_value)
+    #label_Pixel.set_text("Pixel Value:R-"+ str(Pixel_R_value) + " G-" + str(Pixel_G_Value) + " B-" + str(Pixel_B_value) )
+    label_Pixel_hex.set_text_color(Pixel_value)
+    label_Pixel_hex.set_text("Pixel Value:%06x" % Pixel_value)
+    gc.collect()
+    wait_ms(5)
