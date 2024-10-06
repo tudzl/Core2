@@ -1,4 +1,5 @@
-#INA260_Core2 demo V2.6B  0162C86C
+#INA260_Core2 demo V2.8  0162C86C
+#Zell 2024.10.6
 #hall speed detect
 #port B G26,G36: pin26 not working as digitalRead,
 from m5stack import *
@@ -27,7 +28,7 @@ PWM_EN = 1
 #PWM0.resume()
 #image_BG = M5Img("res/BMW_next.png", x=0, y=0, parent=None)
 image_BG = M5Img("res/BMW_coupit BG3.png", x=0, y=0, parent=None)
-Title = M5Label('INA260_Core2 Hall demo V2.7', x=20, y=5, color=0x2517de, font=FONT_MONT_14, parent=None)
+Title = M5Label('INA260_Core2 Hall demo V2.8', x=20, y=5, color=0x2517de, font=FONT_MONT_14, parent=None)
 
 label_vol = M5Label('Vbus_In:', x=20, y=40, color=0xEE9E00, font=FONT_MONT_18, parent=None)
 label_Cur = M5Label('Current:', x=20, y=60, color=0xEE1E00, font=FONT_MONT_18, parent=None)
