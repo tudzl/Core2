@@ -1,4 +1,4 @@
-#current issue: stuck after some time running! unknown reason
+#current issue: stuck after some time running! unknown reason,with GC solved?
 #V1.7B fixed distance bugs! tested haversine calc working! 
 #V1.7A added gc collect and distance calc!!!
 #V1.6D fixed max min bug! int(var) for max()
@@ -57,7 +57,7 @@ Tmr_OVF_cnt = 0
 Tmr_threshold = 5
 GUI_time_refresh_Tmr_threshold  = 2
 
-print('GNSS_test based on DX-GP10 GNSS module(AT6558) V1.7A')
+print('GNSS_test based on DX-GP10 GNSS module(AT6558) V1.7B')
 print('Zell beta version  FW @2024.10.29')
 image_BG = M5Img("res/BMW_coupit BG3.png", x=0, y=0)
 #image_BG = M5Img(0, 0, "res/BMW_coupit BG3.png")
@@ -244,7 +244,7 @@ def callback_timer3(_arg):
               distance = distance+distance_tmp
             coord_pre = Lat_var,Lon_var
             
-            label_DistanceValue.setText(str(distance:.1f))
+            label_DistanceValue.setText(str(f'{distance:.1f}'))
             label_NumbersValue.setText(str(Num_satalite))
             #label_QualityValue.setText(str(Quality_pos))
             label_LatitudeValue.setText(str(Lat_var))
